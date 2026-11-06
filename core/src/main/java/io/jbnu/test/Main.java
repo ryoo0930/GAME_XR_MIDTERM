@@ -15,7 +15,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
-    private Texture playerTexture, blockTexture, flagTexture;
+    private Texture blockTexture, flagTexture;
+    private PlayerRenderer playerRenderer;
     private OrthographicCamera camera;
     private FitViewport viewport;
     private GameWorld world;
@@ -28,7 +29,7 @@ public class Main extends ApplicationAdapter {
         font = new BitmapFont();
         font.setColor(Color.BLACK);
         font.getData().setScale(1.5f);
-        playerTexture = new Texture(Gdx.files.internal("player.png"));
+        playerRenderer = new PlayerRenderer();
         blockTexture = new Texture(Gdx.files.internal("block.png"));
         flagTexture = new Texture(Gdx.files.internal("flag.png"));
 
@@ -54,8 +55,7 @@ public class Main extends ApplicationAdapter {
         }
         Rectangle flag = world.getFlag();
         batch.draw(flagTexture, flag.x, flag.y, flag.width, flag.height);
-        Rectangle player = world.getPlayer().getBounds();
-        batch.draw(playerTexture, player.x, player.y, player.width, player.height);
+        playerRenderer.draw(batch, world.getPlayer());
         String stageLabel = world.isGameOver()
             ? "All stages clear!"
             : "Stage " + world.getCurrentStage() + " / " + GameWorld.STAGE_COUNT;
@@ -86,7 +86,7 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         font.dispose();
-        playerTexture.dispose();
+        playerRenderer.dispose();
         blockTexture.dispose();
         flagTexture.dispose();
     }

@@ -8,18 +8,32 @@ import com.badlogic.gdx.utils.Array;
 
 public class Player {
     private static final float MOVE_SPEED = 260;
+    private static final float RUN_SPEED = 420;
     private static final float JUMP_SPEED = 650;
     private static final float GRAVITY = 1700;
 
     private final Rectangle player = new Rectangle(80, 60, 32, 44);
     private float velocityX, velocityY;
     private boolean grounded;
+    private boolean facingRight = true;
+    private boolean runningJump;
+    private Motion motion = Motion.IDLE;
+    private float animationTime;
+
+    public enum Motion {
+        IDLE, WALK, RUN, JUMP, RUN_JUMP
+    }
 
     public void update(float dt, Array<Rectangle> blocks, float worldWidth) {
         // 좌우 이동과 지상 점프
         velocityX = 0;
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) velocityX -= MOVE_SPEED;
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) velocityX += MOVE_SPEED;
+        boolean running = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)
+            || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
+        float speed = running ? RUN_SPEED : MOVE_SPEED;
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) velocityX -= speed;
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) velocityX += speed;
+        if (velocityX != 0) facingRight = velocityX > 0;
+        if (grounded) runningJump = running && velocityX != 0;
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && grounded) {
             velocityY = JUMP_SPEED;
             grounded = false;
@@ -35,9 +49,22 @@ public class Player {
         // 낭떠러지에 떨어지면 시작점으로 복귀합니다.
         if (player.y < -100) {
             player.setPosition(80, 60);
+            velocityX = 0;
             velocityY = 0;
             grounded = false;
+            runningJump = false;
+            facingRight = true;
+            motion = Motion.IDLE;
+            animationTime = 0;
+            return;
         }
+
+        Motion nextMotion;
+        if (!grounded) nextMotion = runningJump ? Motion.RUN_JUMP : Motion.JUMP;
+        else if (velocityX == 0) nextMotion = Motion.IDLE;
+        else nextMotion = running ? Motion.RUN : Motion.WALK;
+        animationTime = nextMotion == motion ? animationTime + dt : 0;
+        motion = nextMotion;
     }
 
     private void moveX(float dt, Array<Rectangle> blocks, float worldWidth) {
@@ -70,5 +97,17 @@ public class Player {
 
     public Rectangle getBounds() {
         return player;
+    }
+
+    public Motion getMotion() {
+        return motion;
+    }
+
+    public float getAnimationTime() {
+        return animationTime;
+    }
+
+    public boolean isFacingRight() {
+        return facingRight;
     }
 }
