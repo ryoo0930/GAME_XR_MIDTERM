@@ -2,6 +2,7 @@ package io.jbnu.test;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
@@ -24,6 +25,8 @@ public class Main extends ApplicationAdapter {
     private FitViewport viewport;
     private GameWorld world;
     private BitmapFont font;
+    private MainMenu mainMenu;
+    private boolean showingMenu = true;
 
     @Override
     public void create() {
@@ -42,10 +45,30 @@ public class Main extends ApplicationAdapter {
         viewport = new FitViewport(VIEW_WIDTH, VIEW_HEIGHT, camera);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
         updateCamera();
+        mainMenu = new MainMenu();
+        mainMenu.show();
     }
 
     @Override
     public void render() {
+        if (showingMenu) {
+            MainMenu.Action action = mainMenu.update();
+            if (action == MainMenu.Action.START) {
+                world = new GameWorld();
+                updateCamera();
+                showingMenu = false;
+            } else if (action == MainMenu.Action.QUIT) {
+                Gdx.app.exit();
+            }
+            mainMenu.render(batch);
+            return;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            showingMenu = true;
+            mainMenu.show();
+            mainMenu.render(batch);
+            return;
+        }
         // 큰 프레임 시간으로 인해 한 번에 너무 멀리 이동하는 것을 제한합니다.
         float dt = Math.min(Gdx.graphics.getDeltaTime(), 1f / 30f);
         update(dt);
@@ -93,12 +116,14 @@ public class Main extends ApplicationAdapter {
     public void resize(int width, int height) {
         viewport.update(width, height, false);
         updateCamera();
+        if (mainMenu != null) mainMenu.resize(width, height);
     }
 
     @Override
     public void dispose() {
         batch.dispose();
         font.dispose();
+        mainMenu.dispose();
         playerRenderer.dispose();
         enemyRenderer.dispose();
         blockTexture.dispose();
