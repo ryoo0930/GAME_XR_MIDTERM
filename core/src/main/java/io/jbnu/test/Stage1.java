@@ -6,6 +6,8 @@ import com.badlogic.gdx.utils.Array;
 public class Stage1 implements Stage {
     private final Rectangle flag = new Rectangle(2420, 344, 20, 100);
     private final Array<Rectangle> blocks = new Array<>();
+    // Define this stage's enemy and boss placements here when combat is added.
+    private final Array<Enemy> enemies = new Array<>();
 
     public Stage1() {
         blocks.add(new Rectangle(0, 0, 620, 60));
@@ -34,5 +36,10 @@ public class Stage1 implements Stage {
     @Override
     public Array<Rectangle> getBlocks() {
         return blocks;
+    }
+
+    @Override
+    public Array<Enemy> getEnemies() {
+        return enemies;
     }
 }

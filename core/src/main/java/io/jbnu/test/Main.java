@@ -19,6 +19,7 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Texture blockTexture, flagTexture;
     private PlayerRenderer playerRenderer;
+    private EnemyRenderer enemyRenderer;
     private OrthographicCamera camera;
     private FitViewport viewport;
     private GameWorld world;
@@ -32,6 +33,7 @@ public class Main extends ApplicationAdapter {
         font.setColor(Color.BLACK);
         font.getData().setScale(1.5f);
         playerRenderer = new PlayerRenderer();
+        enemyRenderer = new EnemyRenderer();
         blockTexture = new Texture(Gdx.files.internal("block.png"));
         flagTexture = new Texture(Gdx.files.internal("flag.png"));
 
@@ -58,6 +60,9 @@ public class Main extends ApplicationAdapter {
         }
         Rectangle flag = world.getFlag();
         batch.draw(flagTexture, flag.x, flag.y, flag.width, flag.height);
+        for (Enemy enemy : world.getEnemies()) {
+            enemyRenderer.draw(batch, enemy);
+        }
         playerRenderer.draw(batch, world.getPlayer());
         String stageLabel = world.isGameOver()
             ? "All stages clear!"
@@ -95,6 +100,7 @@ public class Main extends ApplicationAdapter {
         batch.dispose();
         font.dispose();
         playerRenderer.dispose();
+        enemyRenderer.dispose();
         blockTexture.dispose();
         flagTexture.dispose();
     }

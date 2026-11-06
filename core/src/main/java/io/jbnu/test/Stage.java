@@ -7,4 +7,9 @@ public interface Stage {
     float getWorldWidth();
     Rectangle getFlag();
     Array<Rectangle> getBlocks();
+    Array<Enemy> getEnemies();
+
+    default boolean isCleared(Player player) {
+        return player.getBounds().overlaps(getFlag());
+    }
 }
