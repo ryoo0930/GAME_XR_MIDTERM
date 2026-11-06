@@ -1,0 +1,10 @@
+package io.jbnu.test;
+
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
+
+public interface Stage {
+    float getWorldWidth();
+    Rectangle getFlag();
+    Array<Rectangle> getBlocks();
+}

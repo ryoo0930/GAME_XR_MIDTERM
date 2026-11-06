@@ -4,6 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -17,11 +19,15 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera camera;
     private FitViewport viewport;
     private GameWorld world;
+    private BitmapFont font;
 
     @Override
     public void create() {
         world = new GameWorld();
         batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.setColor(Color.BLACK);
+        font.getData().setScale(1.5f);
         playerTexture = new Texture(Gdx.files.internal("player.png"));
         blockTexture = new Texture(Gdx.files.internal("block.png"));
         flagTexture = new Texture(Gdx.files.internal("flag.png"));
@@ -50,6 +56,12 @@ public class Main extends ApplicationAdapter {
         batch.draw(flagTexture, flag.x, flag.y, flag.width, flag.height);
         Rectangle player = world.getPlayer().getBounds();
         batch.draw(playerTexture, player.x, player.y, player.width, player.height);
+        String stageLabel = world.isGameOver()
+            ? "All stages clear!"
+            : "Stage " + world.getCurrentStage() + " / " + GameWorld.STAGE_COUNT;
+        font.draw(batch, stageLabel,
+            camera.position.x - viewport.getWorldWidth() / 2 + 20,
+            camera.position.y + viewport.getWorldHeight() / 2 - 20);
         batch.end();
     }
 
@@ -61,7 +73,7 @@ public class Main extends ApplicationAdapter {
         // 카메라는 X축으로만 따라갑니다.
         Rectangle player = world.getPlayer().getBounds();
         camera.position.x = MathUtils.clamp(
-            player.x + player.width / 2, 400, GameWorld.WORLD_WIDTH - 400);
+            player.x + player.width / 2, 400, world.getWorldWidth() - 400);
         camera.update();
     }
 
@@ -73,6 +85,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+        font.dispose();
         playerTexture.dispose();
         blockTexture.dispose();
         flagTexture.dispose();

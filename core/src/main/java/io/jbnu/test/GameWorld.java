@@ -4,35 +4,35 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 
 public class GameWorld {
-    public static final float WORLD_WIDTH = 2600;
+    public static final int STAGE_COUNT = 3;
 
-    private final Player player = new Player();
-    private final Rectangle flag = new Rectangle(2420, 344, 20, 100);
-    private final Array<Rectangle> blocks = new Array<>();
+    private Player player = new Player();
+    private Stage stage = new Stage1();
     private boolean gameOver;
-
-    public GameWorld() {
-        // x, y, 너비, 높이. 바닥도 같은 충돌 블록입니다.
-        blocks.add(new Rectangle(0, 0, 620, 60));
-        blocks.add(new Rectangle(760, 0, 540, 60));
-        blocks.add(new Rectangle(1440, 0, 1160, 60));
-        blocks.add(new Rectangle(300, 60, 80, 64));
-        blocks.add(new Rectangle(900, 60, 96, 80));
-        blocks.add(new Rectangle(1080, 180, 160, 24));
-        blocks.add(new Rectangle(1650, 60, 120, 70));
-        blocks.add(new Rectangle(1790, 60, 120, 140));
-        blocks.add(new Rectangle(1930, 60, 120, 210));
-        blocks.add(new Rectangle(2100, 270, 110, 24));
-        blocks.add(new Rectangle(2280, 320, 210, 24));
-    }
+    private int currentStage = 1;
 
     public void update(float dt) {
         if (gameOver || dt <= 0) return;
 
-        player.update(dt, blocks, WORLD_WIDTH);
+        player.update(dt, stage.getBlocks(), stage.getWorldWidth());
 
-        // 깃발에 닿으면 게임 로직을 멈추고 마지막 화면을 유지합니다.
-        if (player.getBounds().overlaps(flag)) gameOver = true;
+        if (player.getBounds().overlaps(stage.getFlag())) {
+            if (currentStage < STAGE_COUNT) {
+                currentStage++;
+                stage = currentStage == 2 ? new Stage2() : new Stage3();
+                player = new Player();
+            } else {
+                gameOver = true;
+            }
+        }
+    }
+
+    public int getCurrentStage() {
+        return currentStage;
+    }
+
+    public float getWorldWidth() {
+        return stage.getWorldWidth();
     }
 
     public Player getPlayer() {
@@ -40,11 +40,11 @@ public class GameWorld {
     }
 
     public Rectangle getFlag() {
-        return flag;
+        return stage.getFlag();
     }
 
     public Array<Rectangle> getBlocks() {
-        return blocks;
+        return stage.getBlocks();
     }
 
     public boolean isGameOver() {
