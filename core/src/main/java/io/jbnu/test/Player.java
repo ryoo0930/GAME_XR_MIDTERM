@@ -18,9 +18,9 @@ public class Player {
     public void update(float dt, Array<Rectangle> blocks, float worldWidth) {
         // 좌우 이동과 지상 점프
         velocityX = 0;
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) velocityX -= MOVE_SPEED;
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) velocityX += MOVE_SPEED;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && grounded) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) velocityX -= MOVE_SPEED;
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) velocityX += MOVE_SPEED;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && grounded) {
             velocityY = JUMP_SPEED;
             grounded = false;
         }
